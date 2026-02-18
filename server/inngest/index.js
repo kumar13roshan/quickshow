@@ -52,4 +52,8 @@ export const functions= [
     syncUserCreation,
     syncUserDeletion,
     syncUserUpdation
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> 07c233c (fixed inngest api handler)
