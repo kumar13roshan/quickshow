@@ -1,8 +1,9 @@
-import React, { use, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { MenuIcon, SearchIcon, XIcon, TicketPlus } from 'lucide-react'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
+import { useAppContext } from '../context/AppContext'
 
 const Navbar = () => {
 
@@ -11,6 +12,15 @@ const{user}=useUser()
 const{openSignIn}=useClerk()
 
 const navigate = useNavigate()
+
+const {favoriteMovies}=useAppContext()
+const signInAppearance = {
+  elements: {
+    socialButtons: { display: 'none' },
+    alternativeMethods: { display: 'none' },
+    dividerRow: { display: 'none' },
+  },
+}
 
 
   return (
@@ -30,7 +40,7 @@ const navigate = useNavigate()
                   <Link onClick={() => { scrollTo(0,0);setIsOpen(false) }} to='/movies'>Movies</Link>
                   <Link onClick={() => { scrollTo(0,0);setIsOpen(false) }} to='/'>Theaters</Link>
                   <Link onClick={() => { scrollTo(0,0);setIsOpen(false) }} to='/'>Releases</Link>
-                  <Link onClick={() => { scrollTo(0,0);setIsOpen(false) }} to='/favorite'>Favorites</Link>
+                  {favoriteMovies.length >0 && <Link onClick={() => { scrollTo(0,0);setIsOpen(false) }} to='/favorite'>Favorites</Link>}
 
      </div>
 
@@ -39,7 +49,12 @@ const navigate = useNavigate()
 
          {
           !user ? (
-            <button  onClick={openSignIn} className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'>Login</button>
+            <button
+              onClick={() => openSignIn({ withSignUp: false, transferable: false, appearance: signInAppearance })}
+              className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'
+            >
+              Login
+            </button>
 
           ) : (
             <UserButton>
