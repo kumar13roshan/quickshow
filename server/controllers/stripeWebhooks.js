@@ -1,6 +1,7 @@
 import stripe from "stripe"
 import Booking from '../models/Booking.js'
 import Show from '../models/Show.js'
+import { inngest } from '../inngest/index.js'
 
 const markBookingPaid = async (bookingId) => {
     if (!bookingId) return;
@@ -30,20 +31,29 @@ export const stripeWebhooks = async (request, response)=>{
 
     try {
          switch (event.type) {
-           case "payment_intent.succeeded":{
-    const paymentIntent= event.data.object;
-    const sessionList=await stripeInstance.checkout.sessions.list({
+          case "payment_intent.succeeded": {
+    const paymentIntent = event.data.object;
+    const sessionList = await stripeInstance.checkout.sessions.list({
         payment_intent: paymentIntent.id
     })
-    if (!sessionList.data?.length) {
-        break;
-    }
-    const session=sessionList.data[0];
+    if (!sessionList.data?.length) break;
+    const session = sessionList.data[0];
     const bookingId = session.metadata?.bookingId;
-    if (!bookingId) {
-        break;
-    }
-    await markBookingPaid(bookingId)
+    if (!bookingId) break;
+    const booking = await Booking.findByIdAndUpdate(bookingId, {
+        isPaid: true,
+        paymentLink: ""
+    }, { new: true });
+    const show = await Show.findById(booking.show);
+    booking.bookedSeats.forEach((seat) => {
+        show.occupiedSeats[seat] = booking.user;
+    });
+    show.markModified('occupiedSeats');
+    await show.save();
+    await inngest.send({
+        name: "app/show.booked",
+        data: { bookingId }
+    });
     break;
 }
 
