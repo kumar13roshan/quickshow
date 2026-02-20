@@ -1,5 +1,6 @@
 import stripe from "stripe"
 import Booking from '../models/Booking.js'
+import Show from '../models/Show.js'
 
 const markBookingPaid = async (bookingId) => {
     if (!bookingId) return;
@@ -29,23 +30,22 @@ export const stripeWebhooks = async (request, response)=>{
 
     try {
          switch (event.type) {
-            case "payment_intent.succeeded":{
-                const paymentIntent= event.data.object;
-                const sessionList=await stripeInstance.checkout.sessions.list({
-                    payment_intent: paymentIntent.id
-                })
-                if (!sessionList.data?.length) {
-                    break;
-                }
-                const session=sessionList.data[0];
-                const bookingId = session.metadata?.bookingId;
-                if (!bookingId) {
-                    break;
-                }
-
-                await markBookingPaid(bookingId)
-                break;
-            }
+           case "payment_intent.succeeded":{
+    const paymentIntent= event.data.object;
+    const sessionList=await stripeInstance.checkout.sessions.list({
+        payment_intent: paymentIntent.id
+    })
+    if (!sessionList.data?.length) {
+        break;
+    }
+    const session=sessionList.data[0];
+    const bookingId = session.metadata?.bookingId;
+    if (!bookingId) {
+        break;
+    }
+    await markBookingPaid(bookingId)
+    break;
+}
 
             case "checkout.session.completed": {
                 const session = event.data.object;
