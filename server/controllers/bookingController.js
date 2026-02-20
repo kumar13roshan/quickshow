@@ -85,11 +85,7 @@ export const createBooking=async (req, res)=>{
        booking.paymentLink=session.url
        await booking.save()
 
-       selectedSeats.forEach((seat)=>{
-            showData.occupiedSeats[seat]=userId;
-       })
-       showData.markModified('occupiedSeats');
-       await showData.save();
+       
 
 
 
