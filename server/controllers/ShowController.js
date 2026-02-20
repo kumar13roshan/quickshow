@@ -65,23 +65,31 @@ export const addShow = async(req, res)=>{
                 movie=await Movie.create(movieDetails);
 
               }
-              const showsToCreate =[];
-              showsInput.forEach(show=>{
-                const showDate=show.date;
-                show.time.forEach((time)=>{
-const dateTimeString = `${showDate}T${time}:00+05:30`; // IST fix
-                    showsToCreate.push({
-                        movie:movieId,
-                        showDateTime: new Date(dateTimeString),
-                        showPrice,
-                        occupiedSeats:{}
-                })
-              })
-            });
+      
+             // NAYA — yeh lagao:
+const showsToCreate = [];
+for (const show of showsInput) {
+    const showDate = show.date;
+    for (const time of show.time) {
+        const dateTimeString = `${showDate}T${time}:00+05:30`;
+        const showDateTime = new Date(dateTimeString);
 
-            if(showsToCreate.length>0){
-                await Show.insertMany(showsToCreate)
-            }
+        // Duplicate check
+        const existing = await Show.findOne({ movie: movieId, showDateTime });
+        if (!existing) {
+            showsToCreate.push({
+                movie: movieId,
+                showDateTime,
+                showPrice,
+                occupiedSeats: {}
+            });
+        }
+    }
+}
+
+if (showsToCreate.length > 0) {
+    await Show.insertMany(showsToCreate)
+}
 
             res.json({success: true, message: 'Show Added successfully.'})
 
