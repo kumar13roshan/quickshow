@@ -98,19 +98,17 @@ export const createBooking=async (req, res)=>{
     }
 }
 
-export const getOccupiedSeats=async (req,res) =>{
-     try{
-
-        const {showId}=req.params;
-        const showData=await Show.findById(showId)
-
-        const occupiedSeats=Object.keys(showData.occupiedSeats)
-
-        res.json({success:true,occupiedSeats})
-
-     }catch (error){
+export const getOccupiedSeats = async (req, res) => {
+    try {
+        const { showId } = req.params;
+        const paidBookings = await Booking.find({
+            show: showId,
+            isPaid: true
+        });
+        const occupiedSeats = paidBookings.flatMap(booking => booking.bookedSeats);
+        res.json({ success: true, occupiedSeats });
+    } catch (error) {
         console.log(error.message);
-        res.json({success:false, message: error.message})
-        
-     }
+        res.json({ success: false, message: error.message });
+    }
 }
