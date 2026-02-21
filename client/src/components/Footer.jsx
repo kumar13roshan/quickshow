@@ -11,8 +11,7 @@ const Footer = () => {
 
 
                     <p className="mt-6 text-sm">
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                    </p>
+QuickShow is a modern movie ticket booking platform designed to make cinema planning fast, simple, and enjoyable. Discover trending movies, explore detailed show timings, select your favorite seats, and manage bookings effortlessly — all in one place. Our goal is to deliver a smooth and reliable experience so you can focus on enjoying the magic of movies without any hassle.                    </p>
 
                     <div className="flex items-center gap-2 mt-4">
                         <img src={assets.googlePlay} alt="google play" className="h-9 w-auto " />
